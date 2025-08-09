@@ -1,4 +1,5 @@
 varying vec3 vGameNormal;
+varying vec2 vUv;
 
 void main()
 {
@@ -10,4 +11,5 @@ void main()
 
     // Sun shade
     vGameNormal = worldNormal;
+    vUv = uv;
 }

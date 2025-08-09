@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import Game from '@/Game.js'
 import View from '@/View/View.js'
 import State from '@/State/State.js'
+import Debug from '@/Debug/Debug.js'
 import Terrain from './Terrain.js'
 import TerrainGradient from './TerrainGradient.js'
 import TerrainMaterial from './Materials/TerrainMaterial.js'
@@ -13,8 +14,8 @@ export default class Terrains
     {
         this.game = Game.getInstance()
         this.state = State.getInstance()
-        this.view = View.getInstance()
-        this.debug = View.getInstance()
+    this.view = View.getInstance()
+    this.debug = Debug.getInstance()
 
         this.viewport = this.state.viewport
         this.sky =  this.view.sky
@@ -73,7 +74,7 @@ export default class Terrains
         if(!this.debug.active)
             return
 
-        const folder = debug.ui.getFolder('view/terrains')
+    const folder = this.debug.ui.getFolder('view/terrains')
 
         folder
             .add(this.material, 'wireframe')

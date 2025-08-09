@@ -53,4 +53,8 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 - Debug UI uses [lil-gui](https://github.com/georgealways/lil-gui) and [stats.js](https://github.com/mrdoob/stats.js).
 - Procedural generation uses [simplex-noise](https://github.com/jwagner/simplex-noise) and [gl-matrix](http://glmatrix.net/).
 
-]
+### Production Build
+
+```sh
+npm run build
+```

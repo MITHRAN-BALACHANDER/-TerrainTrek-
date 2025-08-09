@@ -18,6 +18,9 @@ export default class Game
 
         Game.instance = this
 
+    // Root DOM element used for pointer lock and fullscreen
+    this.domElement = document.querySelector('.game') || document.body
+
         this.seed = 'p'
         this.debug = new Debug()
         this.state = new State()

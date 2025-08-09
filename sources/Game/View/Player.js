@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import Game from '@/Game.js'
 import View from '@/View/View.js'
@@ -16,6 +17,14 @@ export default class Player
         this.debug = Debug.getInstance()
 
         this.scene = this.view.scene
+        this.loader = new GLTFLoader()
+
+        // Custom model state
+        this.custom = {
+            enabled: false,
+            url: '',
+            scale: 1,
+        }
 
         this.setGroup()
         this.setHelper()
@@ -30,14 +39,18 @@ export default class Player
     
     setHelper()
     {
-        this.helper = new THREE.Mesh()
-        this.helper.material = new PlayerMaterial()
-        this.helper.material.uniforms.uColor.value = new THREE.Color('violet')
-        this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
+    // Stick figure billboard (quad + shader)
+    const geom = new THREE.PlaneGeometry(1.2, 2.2)
+    // Move so feet are at y=0
+    geom.translate(0, 1.1, 0)
 
-        this.helper.geometry = new THREE.CapsuleGeometry(0.5, 0.8, 3, 16),
-        this.helper.geometry.translate(0, 0.9, 0)
-        this.group.add(this.helper)
+    this.helper = new THREE.Mesh(geom, new PlayerMaterial())
+    this.helper.material.uniforms.uColor.value = new THREE.Color('violet')
+    this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
+    this.group.add(this.helper)
+
+    // Container for custom model
+    this.model = null
 
         // const arrow = new THREE.Mesh(
         //     new THREE.ConeGeometry(0.2, 0.2, 4),
@@ -62,8 +75,28 @@ export default class Player
         const playerFolder = this.debug.ui.getFolder('view/player')
 
         playerFolder.addColor(this.helper.material.uniforms.uColor, 'value')
-    }
 
+        const customFolder = this.debug.ui.getFolder('view/player/custom')
+        customFolder
+            .add(this.custom, 'enabled')
+            .name('Use custom model')
+            .onChange((v) =>
+            {
+                if(this.model)
+                    this.model.visible = !!v
+                this.helper.visible = !v
+            })
+
+        const actions = {
+            loadFile: () => this.#promptModelFile(),
+            loadUrl: () => this.#loadModelFromUrl(this.custom.url)
+        }
+
+        customFolder.add(actions, 'loadFile').name('Load .glb/.gltf file')
+        customFolder.add(this.custom, 'url').name('Model URL')
+        customFolder.add(actions, 'loadUrl').name('Load from URL')
+        customFolder.add(this.custom, 'scale').min(0.1).max(10).step(0.1).onChange(() => this.#applyModelScale())
+    }
 
     update()
     {
@@ -76,8 +109,87 @@ export default class Player
             playerState.position.current[2]
         )
         
-        // Helper
-        this.helper.rotation.y = playerState.rotation
+    // Rotate visuals (billboarded stick can still face move dir)
+    this.helper.rotation.y = playerState.rotation
+        if(this.model)
+            this.model.rotation.y = playerState.rotation
         this.helper.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+    }
+
+    // Private: file input flow
+    #promptModelFile()
+    {
+        if(this._fileInput)
+        {
+            this._fileInput.value = ''
+        }
+        else
+        {
+            this._fileInput = document.createElement('input')
+            this._fileInput.type = 'file'
+            this._fileInput.accept = '.glb,.gltf,model/gltf+json,model/gltf-binary'
+            this._fileInput.style.display = 'none'
+            document.body.appendChild(this._fileInput)
+
+            this._fileInput.addEventListener('change', (e) =>
+            {
+                const file = e.target.files && e.target.files[0]
+                if(!file) return
+                const objectUrl = URL.createObjectURL(file)
+                this.#loadModelFromUrl(objectUrl, () => URL.revokeObjectURL(objectUrl))
+            })
+        }
+        this._fileInput.click()
+    }
+
+    #loadModelFromUrl(url, onDone)
+    {
+        if(!url) return
+        this.loader.load(
+            url,
+            (gltf) =>
+            {
+                this.#setModel(gltf.scene)
+                if(onDone) onDone()
+                // Auto-enable custom model when loaded
+                this.custom.enabled = true
+                if(this.model) this.model.visible = true
+                this.helper.visible = false
+            },
+            undefined,
+            (err) =>
+            {
+                console.error('Failed to load model', err)
+                if(onDone) onDone()
+            }
+        )
+    }
+
+    #setModel(scene)
+    {
+        // Remove existing
+        if(this.model)
+        {
+            this.group.remove(this.model)
+        }
+
+        // Normalize position so feet sit at y=0
+        const box = new THREE.Box3().setFromObject(scene)
+        if(box.isEmpty() === false)
+        {
+            const minY = box.min.y
+            scene.position.y -= minY
+        }
+
+        this.model = scene
+        this.model.visible = this.custom.enabled
+        this.#applyModelScale()
+        this.group.add(this.model)
+    }
+
+    #applyModelScale()
+    {
+        if(this.model)
+            this.model.scale.setScalar(this.custom.scale)
     }
 }

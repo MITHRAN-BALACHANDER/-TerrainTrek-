@@ -13,7 +13,11 @@ export default function PlayerMaterial()
             uSunPosition: { value: null }
         },
         vertexShader: vertexShader,
-        fragmentShader: fragmentShader
+        fragmentShader: fragmentShader,
+        transparent: true,
+        depthTest: true,
+        depthWrite: true,
+        side: THREE.DoubleSide
     })
 
     return material

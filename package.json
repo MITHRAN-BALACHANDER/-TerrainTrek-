@@ -5,8 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+"dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+
   },
   "author": "",
   "license": "ISC",

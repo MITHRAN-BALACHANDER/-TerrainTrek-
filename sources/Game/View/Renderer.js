@@ -85,6 +85,7 @@ export default class Renderer
     {
         this.instance.renderLists.dispose()
         this.instance.dispose()
-        this.renderTarget.dispose()
+        if (this.renderTarget && typeof this.renderTarget.dispose === 'function')
+            this.renderTarget.dispose()
     }
 }
