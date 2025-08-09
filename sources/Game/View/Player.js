@@ -32,7 +32,7 @@ export default class Player
     {
         this.helper = new THREE.Mesh()
         this.helper.material = new PlayerMaterial()
-        this.helper.material.uniforms.uColor.value = new THREE.Color('#fff8d6')
+        this.helper.material.uniforms.uColor.value = new THREE.Color('violet')
         this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
 
         this.helper.geometry = new THREE.CapsuleGeometry(0.5, 0.8, 3, 16),
