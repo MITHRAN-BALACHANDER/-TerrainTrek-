@@ -39,14 +39,60 @@ export default class Player
     
     setHelper()
     {
-    // Stick figure billboard (quad + shader)
-    const geom = new THREE.PlaneGeometry(1.2, 2.2)
-    // Move so feet are at y=0
-    geom.translate(0, 1.1, 0)
+    // 3D stick human composed of simple primitives
+    this.helper = new THREE.Group()
+    this.material = new PlayerMaterial()
+    this.material.uniforms.uColor.value = new THREE.Color('violet')
+    this.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
 
-    this.helper = new THREE.Mesh(geom, new PlayerMaterial())
-    this.helper.material.uniforms.uColor.value = new THREE.Color('violet')
-    this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
+    const parts = []
+
+    // Head
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 18), this.material)
+    head.position.y = 1.62
+    parts.push(head)
+
+    // Neck
+    const neck = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.15, 6, 12), this.material)
+    neck.position.y = 1.38
+    parts.push(neck)
+
+    // Torso
+    const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.75, 6, 18), this.material)
+    torso.position.y = 1.0
+    parts.push(torso)
+
+    // Arms (capsules for smooth ends) with shoulder pivot
+    const armGeom = new THREE.CapsuleGeometry(0.09, 0.6, 6, 12)
+    const shoulderY = 1.45
+    const shoulderX = 0.34
+    const armOffsetDown = - (0.6 * 0.5 -0.4) // place top of capsule at shoulder
+    const armLGroup = new THREE.Group()
+    armLGroup.position.set(-shoulderX, shoulderY, 0)
+    const armL = new THREE.Mesh(armGeom, this.material)
+    armL.position.y = armOffsetDown
+    armLGroup.add(armL)
+    armLGroup.rotation.z = 0.2
+    parts.push(armLGroup)
+
+    const armRGroup = new THREE.Group()
+    armRGroup.position.set(shoulderX, shoulderY, 0)
+    const armR = new THREE.Mesh(armGeom, this.material)
+    armR.position.y = armOffsetDown
+    armRGroup.add(armR)
+    armRGroup.rotation.z = -0.2
+    parts.push(armRGroup)
+
+    // Legs (capsules for smooth ends)
+    const legGeom = new THREE.CapsuleGeometry(0.12, 0.85, 6, 14)
+    const legL = new THREE.Mesh(legGeom, this.material)
+    legL.position.set(-0.18, 0.5, 0)
+    parts.push(legL)
+    const legR = new THREE.Mesh(legGeom, this.material)
+    legR.position.set(0.18, 0.5, 0)
+    parts.push(legR)
+
+    for(const p of parts) this.helper.add(p)
     this.group.add(this.helper)
 
     // Container for custom model
@@ -74,7 +120,7 @@ export default class Player
         // Sphere
         const playerFolder = this.debug.ui.getFolder('view/player')
 
-        playerFolder.addColor(this.helper.material.uniforms.uColor, 'value')
+    playerFolder.addColor(this.material.uniforms.uColor, 'value')
 
         const customFolder = this.debug.ui.getFolder('view/player/custom')
         customFolder
@@ -113,7 +159,7 @@ export default class Player
     this.helper.rotation.y = playerState.rotation
         if(this.model)
             this.model.rotation.y = playerState.rotation
-        this.helper.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+    this.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
     }
 
     // Private: file input flow

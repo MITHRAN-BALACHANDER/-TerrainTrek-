@@ -34,6 +34,43 @@ html, body
     user-select: none;
 }
 
+       .developer-link {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.2s ease;
+            z-index: 9999;
+        }
+        .developer-link:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+      
+        .debug-element {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+     
+        .debug-note {
+            /* background: rgba(255, 255, 255, 0.6); */
+            color: #fff;
+            padding: 4px 8px;
+            /* border-radius: 6px; */
+            font-size: 10px;
+            max-width: 300px;
+            font-family: sans-serif;
+            white-space: nowrap;
+        }
+   
+
 .ui a
 {
     pointer-events: auto;

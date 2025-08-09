@@ -1,5 +1,4 @@
 varying vec3 vGameNormal;
-varying vec2 vUv;
 
 void main()
 {
@@ -7,9 +6,8 @@ void main()
     vec4 viewPosition = viewMatrix * modelPosition;
     gl_Position = projectionMatrix * viewPosition;
 
-    vec3 worldNormal = normalize(mat3(modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz) * normal);
+    vec3 worldNormal = normalize(mat3(modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz) * normalize(normal));
 
     // Sun shade
     vGameNormal = worldNormal;
-    vUv = uv;
 }
