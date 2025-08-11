@@ -65,8 +65,6 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 | V           | Switch camera mode        |
 | B           | Toggle debug interface    |
 | Mouse       | Look around (when locked) |
-| Space       | Jump (fly mode)           |
-| C/Ctrl      | Crouch (fly mode)         |
 
 ## Debug Features (Add `#debug` to URL)
 
