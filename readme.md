@@ -1,8 +1,8 @@
-# Infinite World
+# TerrainTrek
 
 An infinite, procedurally generated 3D world in WebGL using [Three.js](https://threejs.org/), built for fun and exploration.
 
-![Infinite World Screenshot](public/social/share-1200x630.png?raw=true "Infinite World Screenshot")
+![Terraintrek Screenshot](public/social/share-1200x630.png?raw=true "terraintrek Screenshot")
 
 ## Core Features
 
