@@ -75,7 +75,18 @@ export default class Renderer
         if(this.debug.stats)
             this.debug.stats.beforeRender()
 
+        // Render main scene first
         this.instance.render(this.scene, this.camera.instance)
+
+        // If there's an overlay scene (coins, HUD 3D), render it on top without clearing
+        if(this.view && this.view.overlayScene)
+        {
+            const prevAutoClear = this.instance.autoClear
+            this.instance.autoClear = false
+            this.instance.clearDepth()
+            this.instance.render(this.view.overlayScene, this.camera.instance)
+            this.instance.autoClear = prevAutoClear
+        }
 
         if(this.debug.stats)
             this.debug.stats.afterRender()

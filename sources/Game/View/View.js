@@ -7,6 +7,8 @@ import Renderer from './Renderer.js'
 import Sky from './Sky.js'
 import Terrains from './Terrains.js'
 import Water from './Water.js'
+import CoinsView from './CoinsView.js'
+import Minimap from './Minimap.js'
 
 import * as THREE from 'three'
 
@@ -37,6 +39,8 @@ export default class View
         this.chunks = new Chunks()
         this.player = new Player()
         this.grass = new Grass()
+        this.coinsView = new CoinsView()
+        this.minimap = new Minimap()
     }
 
     resize()
@@ -55,6 +59,8 @@ export default class View
         this.chunks.update()
         this.player.update()
         this.grass.update()
+        this.coinsView.update()
+        this.minimap.update()
         this.camera.update()
         this.renderer.update()
     }

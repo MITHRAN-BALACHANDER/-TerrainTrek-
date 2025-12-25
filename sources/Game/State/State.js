@@ -6,6 +6,7 @@ import Sun from './Sun.js'
 import Player from './Player.js'
 import Terrains from './Terrains.js'
 import Chunks from './Chunks.js'
+import Coins from './Coins.js'
 
 export default class State
 {
@@ -31,6 +32,7 @@ export default class State
         this.player = new Player()
         this.terrains = new Terrains()
         this.chunks = new Chunks()
+        this.coins = new Coins()
     }
 
     resize()
@@ -46,5 +48,6 @@ export default class State
         this.sun.update()
         this.player.update()
         this.chunks.update()
+        this.coins.update()
     }
 }
