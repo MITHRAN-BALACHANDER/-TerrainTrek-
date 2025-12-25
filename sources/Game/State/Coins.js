@@ -13,7 +13,8 @@ export default class Coins
         this.collectedCount = 0
         this.collectionRadius = 2.0
         
-        this.setupUI()
+        // Do not create separate UI; progression will host coin display
+        if(this.state.progression) this.state.progression.updateCoins(this.collectedCount)
         this.generateCoins()
     }
 
@@ -79,9 +80,10 @@ export default class Coins
         coin.collected = true
         coin.collectionTime = this.state.time.elapsed
         this.collectedCount++
-        
-        // Update UI
-        this.coinCounter.textContent = `💰 Coins: ${this.collectedCount}`
+        // Update unified HUD via progression
+        if(this.state.progression && this.state.progression.updateCoins) {
+            this.state.progression.updateCoins(this.collectedCount)
+        }
         
         // Add particle burst effect data
         coin.shatterProgress = 0
@@ -115,9 +117,6 @@ export default class Coins
 
     destroy()
     {
-        if(this.coinCounter && this.coinCounter.parentElement)
-        {
-            this.coinCounter.parentElement.removeChild(this.coinCounter)
-        }
+        // nothing to remove here — progression owns the HUD
     }
 }

@@ -20,109 +20,77 @@ export default class Missions
 
     setupUI()
     {
-        // Mission panel
+        // Mission panel (redesigned)
         this.missionPanel = document.createElement('div')
         this.missionPanel.classList.add('mission-panel')
         this.missionPanel.innerHTML = `
-            <div class="mission-title">No Active Mission</div>
-            <div class="mission-objective"></div>
-            <div class="mission-progress"></div>
+            <div class="mission-row">
+                <div class="mission-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" fill="#0b1220" />
+                        <circle cx="12" cy="12" r="6" fill="#3ddc84" />
+                        <circle cx="12" cy="12" r="2" fill="#ffffff" />
+                    </svg>
+                </div>
+                <div class="mission-body">
+                    <div class="mission-title">No Active Mission</div>
+                    <div class="mission-objective">—</div>
+                </div>
+                <button class="mission-close" title="Hide">
+                    <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mission-progress">
+                <div class="mission-progress-bar"><div class="mission-progress-fill" style="width:0%"></div></div>
+                <div class="mission-progress-text">0 / 0</div>
+            </div>
         `
         document.querySelector('.ui').appendChild(this.missionPanel)
-        
-        // Add styles
+
+        // Close/hide handler
+        this.missionPanel.querySelector('.mission-close').addEventListener('click', () => {
+            this.missionPanel.style.display = 'none'
+        })
+
+        // Add styles (modern compact card)
         const style = document.createElement('style')
         style.textContent = `
             .mission-panel {
                 position: fixed;
-                top: 20px;
-                left: 20px;
-                padding: 15px 20px;
-                background: rgba(0, 0, 0, 0.75);
-                backdrop-filter: blur(8px);
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                border-left: 4px solid #4CAF50;
-                border-radius: 8px;
-                color: #fff;
-                font-family: 'Segoe UI', sans-serif;
-                min-width: 250px;
-                z-index: 1000;
-                transition: all 0.3s ease;
-            }
-            
-            .mission-panel.completed {
-                border-left-color: #FFD700;
-                animation: missionComplete 0.5s ease;
-            }
-            
-            @keyframes missionComplete {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
-            
-            .mission-title {
-                font-size: 14px;
-                font-weight: bold;
-                color: #4CAF50;
-                margin-bottom: 8px;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
-            
-            .mission-objective {
-                font-size: 16px;
-                margin-bottom: 10px;
-                line-height: 1.4;
-            }
-            
-            .mission-progress {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.7);
-            }
-            
-            .mission-progress-bar {
-                height: 4px;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 2px;
-                margin-top: 8px;
-                overflow: hidden;
-            }
-            
-            .mission-progress-fill {
-                height: 100%;
-                background: linear-gradient(90deg, #4CAF50, #8BC34A);
-                border-radius: 2px;
-                transition: width 0.3s ease;
-            }
-            
-            .mission-complete-popup {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                padding: 30px 50px;
-                background: rgba(0, 0, 0, 0.9);
-                border: 3px solid #FFD700;
+                top: 18px;
+                left: 18px;
+                width: 260px;
+                background: linear-gradient(180deg, rgba(18,20,23,0.95), rgba(10,12,15,0.85));
                 border-radius: 12px;
-                color: #FFD700;
-                font-family: 'Segoe UI', sans-serif;
-                font-size: 24px;
-                font-weight: bold;
-                text-align: center;
-                z-index: 2000;
-                animation: popupIn 0.5s ease;
+                padding: 10px 12px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+                color: #e6f2ff;
+                font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+                z-index: 1200;
+                border: 1px solid rgba(255,255,255,0.06);
+                backdrop-filter: blur(6px) saturate(120%);
             }
-            
-            @keyframes popupIn {
-                0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            }
-            
-            .mission-complete-popup .reward {
-                font-size: 16px;
-                color: #fff;
-                margin-top: 10px;
-            }
+
+            .mission-row { display:flex; align-items:center; gap:10px }
+            .mission-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#3ddc84,#1fa2ff); border-radius:8px; font-size:18px }
+            .mission-body { flex:1; min-width:0 }
+            .mission-title { font-weight:700; font-size:13px; color:#bfffbf; text-transform:uppercase; letter-spacing:0.6px }
+            .mission-objective { font-size:14px; color:rgba(255,255,255,0.9); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+
+            .mission-close { background:transparent; border:none; color:rgba(255,255,255,0.7); font-size:14px; cursor:pointer; padding:6px; border-radius:6px }
+            .mission-close:hover { background:rgba(255,255,255,0.03); color:#fff }
+
+            .mission-progress { margin-top:10px; display:flex; align-items:center; gap:8px }
+            .mission-progress-bar { flex:1; height:8px; background:rgba(255,255,255,0.06); border-radius:6px; overflow:hidden }
+            .mission-progress-fill { height:100%; background:linear-gradient(90deg,#ffd700,#ffb347); width:0%; transition:width 300ms ease }
+            .mission-progress-text { font-size:12px; color:rgba(255,255,255,0.65); min-width:48px; text-align:right }
+
+            .mission-panel.hidden { opacity:0; transform:translateY(-6px); pointer-events:none }
+
+            .mission-complete-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); padding:22px 28px; background:linear-gradient(135deg,#222,#111); border-radius:12px; color:#ffd700; z-index:2000; border:2px solid rgba(255,215,0,0.15) }
+            .mission-complete-popup .reward { font-size:14px; color:#fff; margin-top:6px }
         `
         document.head.appendChild(style)
     }
@@ -274,8 +242,13 @@ export default class Missions
         const popup = document.createElement('div')
         popup.classList.add('mission-complete-popup')
         popup.innerHTML = `
-            🏆 MISSION COMPLETE! 🏆
-            <div class="reward">+${mission.reward.xp} XP | +${mission.reward.coins} 💰</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="32" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7 4v2a5 5 0 0 0 5 5v3H9v2h6v-2h-3v-3a5 5 0 0 0 5-5V4H7z" fill="#ffd700" />
+                </svg>
+                <div style="font-weight:700;color:#ffd700;">MISSION COMPLETE!</div>
+            </div>
+            <div class="reward">+${mission.reward.xp} XP | +${mission.reward.coins} <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><circle cx="12" cy="12" r="8" fill="#ffd700"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
         `
         document.querySelector('.ui').appendChild(popup)
         
@@ -287,7 +260,12 @@ export default class Missions
         const popup = document.createElement('div')
         popup.classList.add('mission-complete-popup')
         popup.innerHTML = `
-            🎉 ALL MISSIONS COMPLETE! 🎉
+            <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="28" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 2l1.9 4.1L18 7l-3 2.6L15.8 14 12 11.6 8.2 14 9 9.6 6 7l4.1-.9L12 2z" fill="#ffd54a"/>
+                </svg>
+                <div style="font-weight:700;color:#ffd54a;">ALL MISSIONS COMPLETE!</div>
+            </div>
             <div class="reward">Congratulations, Explorer!</div>
         `
         document.querySelector('.ui').appendChild(popup)

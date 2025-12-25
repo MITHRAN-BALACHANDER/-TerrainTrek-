@@ -30,36 +30,25 @@ export default class Progression
 
     setupUI()
     {
-        // Stats panel
+        // Unified HUD panel: level, speed, coins (compact single element)
         this.statsPanel = document.createElement('div')
         this.statsPanel.classList.add('stats-panel')
         this.statsPanel.innerHTML = `
-            <div class="stat-row level-row">
-                <span class="stat-label">LEVEL</span>
-                <span class="stat-value level-value">${this.level}</span>
+            <div class="hud-row level-row">
+                <span class="hud-label">LEVEL</span>
+                <span class="hud-value level-value">${this.level}</span>
             </div>
-            <div class="stat-row xp-row">
-                <div class="xp-bar">
-                    <div class="xp-fill"></div>
-                </div>
-                <span class="xp-text">${this.xp}/${this.xpToNextLevel} XP</span>
+            <div class="hud-row speed-row">
+                <span class="hud-label">SPEED</span>
+                <span class="hud-value speed-value">${this.speed.toFixed(2)}x</span>
             </div>
-            <div class="stat-row health-row">
-                <span class="stat-icon">❤️</span>
-                <div class="bar-container">
-                    <div class="bar health-bar"></div>
-                </div>
-                <span class="stat-text health-text">${this.health}</span>
-            </div>
-            <div class="stat-row stamina-row">
-                <span class="stat-icon">⚡</span>
-                <div class="bar-container">
-                    <div class="bar stamina-bar"></div>
-                </div>
-                <span class="stat-text stamina-text">${Math.floor(this.stamina)}</span>
+            <div class="hud-row coins-row">
+                <span class="hud-label">COINS</span>
+                <span class="hud-value coins-value">${this.totalCoins}</span>
             </div>
         `
-        document.querySelector('.ui').appendChild(this.statsPanel)
+        const target = document.querySelector('.ui') || document.body
+        target.appendChild(this.statsPanel)
         
         // Level up popup
         this.levelUpPopup = document.createElement('div')
@@ -67,124 +56,73 @@ export default class Progression
         this.levelUpPopup.style.display = 'none'
         document.querySelector('.ui').appendChild(this.levelUpPopup)
         
-        // Add styles
+        // Add styles (compact HUD)
         const style = document.createElement('style')
         style.textContent = `
             .stats-panel {
                 position: fixed;
-                bottom: 20px;
-                left: 20px;
-                padding: 15px;
-                background: rgba(0, 0, 0, 0.75);
-                backdrop-filter: blur(8px);
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-                color: #fff;
-                font-family: 'Segoe UI', sans-serif;
-                min-width: 200px;
-                z-index: 1000;
+                top: 14px;
+                left: 14px;
+                right: auto !important;
+                padding: 6px 8px !important;
+                background: rgba(0, 0, 0, 0.6) !important;
+                backdrop-filter: none !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                border-radius: 10px !important;
+                color: #fff !important;
+                font-family: 'Segoe UI', sans-serif !important;
+                min-width: 110px !important;
+                max-width: 260px !important;
+                width: auto !important;
+                z-index: 1000 !important;
+                display: inline-flex !important;
+                flex-direction: column !important;
+                gap: 4px !important;
+                align-items: flex-start !important;
+                pointer-events: auto !important;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+                height: auto !important;
+                max-height: 180px !important;
+                overflow: visible !important;
+                box-sizing: border-box !important;
             }
-            
-            .stat-row {
-                display: flex;
-                align-items: center;
-                margin-bottom: 8px;
+
+            .hud-row {
+                display: flex !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                align-items: center !important;
+                gap: 6px !important;
+                direction: ltr !important;
+                padding: 2px 0 !important;
+                margin: 0 !important;
             }
-            
-            .stat-row:last-child {
-                margin-bottom: 0;
-            }
-            
-            .level-row {
-                justify-content: space-between;
-                padding-bottom: 8px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-                margin-bottom: 10px;
-            }
-            
-            .stat-label {
-                font-size: 11px;
-                color: rgba(255, 255, 255, 0.6);
-                letter-spacing: 2px;
-            }
-            
-            .level-value {
-                font-size: 24px;
-                font-weight: bold;
-                color: #FFD700;
-                text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            }
-            
-            .xp-row {
-                flex-direction: column;
-                align-items: stretch;
-                margin-bottom: 12px;
-            }
-            
-            .xp-bar {
-                height: 6px;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 3px;
-                overflow: hidden;
-                margin-bottom: 4px;
-            }
-            
-            .xp-fill {
-                height: 100%;
-                background: linear-gradient(90deg, #9C27B0, #E91E63);
-                border-radius: 3px;
-                transition: width 0.3s ease;
-            }
-            
-            .xp-text {
+
+            .hud-label {
                 font-size: 10px;
-                color: rgba(255, 255, 255, 0.6);
-                text-align: right;
+                color: rgba(255,255,255,0.7);
+                letter-spacing: 1px;
             }
-            
-            .stat-icon {
-                font-size: 14px;
-                margin-right: 8px;
+
+            .hud-value {
+                font-size: 16px;
+                font-weight: 700;
+                color: #fff;
             }
-            
-            .bar-container {
-                flex: 1;
-                height: 8px;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 4px;
-                overflow: hidden;
-            }
-            
-            .bar {
-                height: 100%;
-                border-radius: 4px;
-                transition: width 0.2s ease;
-            }
-            
-            .health-bar {
-                background: linear-gradient(90deg, #f44336, #ff5722);
-            }
-            
-            .stamina-bar {
-                background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            }
-            
-            .stat-text {
-                font-size: 12px;
-                min-width: 30px;
-                text-align: right;
-                margin-left: 8px;
-            }
-            
+
+            .level-value { color: #FFD700; }
+            .speed-value { color: #9EEBA0; }
+            .coins-value { color: #FFD700; }
+
             .level-up-popup {
                 position: fixed;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                padding: 40px 60px;
+                padding: 30px 40px;
                 background: linear-gradient(135deg, rgba(156, 39, 176, 0.95), rgba(233, 30, 99, 0.95));
                 border: 3px solid #FFD700;
-                border-radius: 16px;
+                border-radius: 12px;
                 color: #fff;
                 font-family: 'Segoe UI', sans-serif;
                 text-align: center;
@@ -220,6 +158,24 @@ export default class Progression
         document.head.appendChild(style)
         
         this.updateUI()
+    }
+
+    updateCoins(count)
+    {
+        this.totalCoins = count
+        if(this.statsPanel) {
+            const el = this.statsPanel.querySelector('.coins-value')
+            if(el) el.textContent = String(this.totalCoins)
+        }
+    }
+
+    updateSpeed(speed)
+    {
+        this.speed = speed
+        if(this.statsPanel) {
+            const el = this.statsPanel.querySelector('.speed-value')
+            if(el) el.textContent = `${this.speed.toFixed(2)}x`
+        }
     }
 
     setupStaminaSystem()
@@ -285,20 +241,15 @@ export default class Progression
     updateUI()
     {
         if(!this.statsPanel) return
-        
-        this.statsPanel.querySelector('.level-value').textContent = this.level
-        
-        const xpPercent = (this.xp / this.xpToNextLevel) * 100
-        this.statsPanel.querySelector('.xp-fill').style.width = `${xpPercent}%`
-        this.statsPanel.querySelector('.xp-text').textContent = `${this.xp}/${this.xpToNextLevel} XP`
-        
-        const healthPercent = (this.health / this.maxHealth) * 100
-        this.statsPanel.querySelector('.health-bar').style.width = `${healthPercent}%`
-        this.statsPanel.querySelector('.health-text').textContent = Math.floor(this.health)
-        
-        const staminaPercent = (this.stamina / this.maxStamina) * 100
-        this.statsPanel.querySelector('.stamina-bar').style.width = `${staminaPercent}%`
-        this.statsPanel.querySelector('.stamina-text').textContent = Math.floor(this.stamina)
+
+        const lvl = this.statsPanel.querySelector('.level-value')
+        if(lvl) lvl.textContent = String(this.level)
+
+        const sp = this.statsPanel.querySelector('.speed-value')
+        if(sp) sp.textContent = `${this.speed.toFixed(2)}x`
+
+        const coinsEl = this.statsPanel.querySelector('.coins-value')
+        if(coinsEl) coinsEl.textContent = String(this.totalCoins)
     }
 
     update()

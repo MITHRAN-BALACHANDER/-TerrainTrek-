@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Terrain-Trek</title>
     <link rel="stylesheet" href="./sources/style.css">
     <style>
@@ -11,9 +11,10 @@
 </head>
 <body>
     <div class="game">
-        <div class="ui">
+        <!-- UI container for overlays (minimap, HUD, joystick). kept explicit to avoid race conditions -->
+        <div class="ui" id="ui">
             <div class="mobile-warning">
-                This experience isn't suited for mobile devices
+            
             </div>
             <div class="controls">
                 <div class="group">
@@ -64,6 +65,8 @@
     <a href="https://mithran.app" target="_blank" class="developer-link">
         Developed by Mithran
     </a>
+
+    <noscript>Please enable JavaScript to run this experience.</noscript>
 
     <script type="module" src="./sources/index.js"></script>
    

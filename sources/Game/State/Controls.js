@@ -2,6 +2,7 @@ import EventsEmitter from 'events'
 
 import Game from '@/Game.js'
 import State from '@/State/State.js'
+import Joystick from '@/View/Joystick.js'
 
 export default class Controls
 {
@@ -14,6 +15,28 @@ export default class Controls
 
         this.setKeys()
         this.setPointer()
+        
+        // Mobile joystick (touch)
+        if(typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints))
+        {
+            try {
+                // place joystick on left side by default for mobile
+                this.joystick = new Joystick(this, { size: 120, side: 'left' })
+            } catch(e) { console.warn('Failed to create joystick', e) }
+        }
+
+        // If joystick exists, ensure it updates layout on resize/orientation without refresh
+        if(this.joystick)
+        {
+            this._onJoystickResize = () => {
+                if(this._joystickResizeTimeout) clearTimeout(this._joystickResizeTimeout)
+                this._joystickResizeTimeout = setTimeout(() => {
+                    try { this.joystick.onResize() } catch(e) {}
+                }, 120)
+            }
+            window.addEventListener('resize', this._onJoystickResize)
+            window.addEventListener('orientationchange', this._onJoystickResize)
+        }
 
         this.events.on('debugDown', () =>
         {
@@ -149,5 +172,14 @@ export default class Controls
 
         this.pointer.deltaTemp.x = 0
         this.pointer.deltaTemp.y = 0
+    }
+
+    destroy()
+    {
+        if(this.joystick && this.joystick.destroy) this.joystick.destroy()
+        if(this._onJoystickResize) {
+            window.removeEventListener('resize', this._onJoystickResize)
+            window.removeEventListener('orientationchange', this._onJoystickResize)
+        }
     }
 }

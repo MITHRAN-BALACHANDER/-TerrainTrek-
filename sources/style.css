@@ -16,7 +16,7 @@ html, body
     left: 0;
     width: 100vw;
     height: 100vh;
-    touch-action: none;
+    
 }
 
 .ui
@@ -30,8 +30,7 @@ html, body
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     color: #ffffff;
-    pointer-events: none;
-    user-select: none;
+
 }
 
        .developer-link {
@@ -76,17 +75,6 @@ html, body
     pointer-events: auto;
 }
 
-.ui .mobile-warning
-{
-    display: none;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 200px;
-}
 
 @media (orientation: portrait)
 {
@@ -156,4 +144,50 @@ html, body
     margin-right: var(--key-margin);
     border: 1px solid #ffffff;
     font-size: 9px;
+}
+
+/* Responsive, compact stats / level panel overrides */
+.stats-panel {
+    /* make the panel compact by default */
+    padding: 6px 8px !important;
+    min-width: 110px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    /* Prevent accidental full-height from other rules */
+    height: auto !important;
+    max-height: 140px !important;
+    overflow: hidden !important;
+    display: inline-block !important;
+}
+
+.stats-panel .level-value {
+    font-size: 18px !important;
+}
+
+.stats-panel .xp-text,
+.stats-panel .stat-text {
+    font-size: 10px !important;
+}
+
+/* Make bars smaller */
+.stats-panel .xp-bar { height: 6px !important; }
+.stats-panel .bar-container { height: 6px !important; }
+.stats-panel .stat-icon { font-size: 12px !important; }
+
+/* On very small screens, collapse to a thinner strip and reduce padding */
+@media (max-width: 480px) {
+    .stats-panel {
+        padding: 6px 8px !important;
+        min-width: 110px !important;
+        left: 8px !important;
+        bottom: 8px !important;
+        font-size: 11px !important;
+    }
+
+    .stats-panel .level-value { font-size: 16px !important; }
+}
+
+/* On very wide viewports, keep panel small but spaced */
+@media (min-width: 1200px) {
+    .stats-panel { min-width: 160px !important; }
 }
