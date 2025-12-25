@@ -86,8 +86,17 @@ export default class Coins
         // Add particle burst effect data
         coin.shatterProgress = 0
         
-        // Play collection sound (if you add audio later)
-        console.log(`Coin collected! Total: ${this.collectedCount}`)
+        // Play collection sound
+        if(this.state.audio)
+        {
+            this.state.audio.playCoinCollect()
+        }
+        
+        // Award XP for collecting
+        if(this.state.progression)
+        {
+            this.state.progression.addXP(10)
+        }
     }
 
     update()

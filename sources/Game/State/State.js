@@ -7,6 +7,9 @@ import Player from './Player.js'
 import Terrains from './Terrains.js'
 import Chunks from './Chunks.js'
 import Coins from './Coins.js'
+import Audio from './Audio.js'
+import Progression from './Progression.js'
+import Missions from './Missions.js'
 
 export default class State
 {
@@ -33,6 +36,9 @@ export default class State
         this.terrains = new Terrains()
         this.chunks = new Chunks()
         this.coins = new Coins()
+        this.audio = new Audio()
+        this.progression = new Progression()
+        this.missions = new Missions()
     }
 
     resize()
@@ -49,5 +55,8 @@ export default class State
         this.player.update()
         this.chunks.update()
         this.coins.update()
+        this.audio.update()
+        this.progression.update()
+        this.missions.update()
     }
 }

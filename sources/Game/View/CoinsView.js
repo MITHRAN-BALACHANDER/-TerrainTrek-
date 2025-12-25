@@ -14,8 +14,18 @@ export default class CoinsView
         this.group = new THREE.Group()
         this.view.scene.add(this.group)
         
-        this.coinMeshes = []
+        // Shared geometry for performance
+        this.coinGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32)
+        this.coinGeometry.rotateX(Math.PI * 0.5)
+        
+        this.particleGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.02)
+        
+        this.coinMeshes = new Map() // Map<coinId, {mesh, material, coin, shattered}>
         this.shatterParticles = []
+        
+        // Default sun values
+        this.defaultSunDir = new THREE.Vector3(0, 1, 0)
+        this.defaultSunCol = new THREE.Color(1, 1, 1)
         
         this.createCoinMeshes()
     }
@@ -24,46 +34,46 @@ export default class CoinsView
     {
         if(!this.state.coins) return
         
-        // Create coin geometry (cylinder for coin shape)
-        const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32)
-        geometry.rotateX(Math.PI * 0.5) // Rotate to stand upright
-        
         this.state.coins.coins.forEach(coin => {
-            const material = new CoinMaterial()
-            const mesh = new THREE.Mesh(geometry, material)
-            
-            mesh.position.set(coin.position[0], coin.position[1], coin.position[2])
-            mesh.userData.coinId = coin.id
-            
-            this.group.add(mesh)
-            this.coinMeshes.push({
-                mesh: mesh,
-                material: material,
-                coin: coin
-            })
+            this.addCoinMesh(coin)
+        })
+    }
+
+    addCoinMesh(coin)
+    {
+        const material = new CoinMaterial()
+        const mesh = new THREE.Mesh(this.coinGeometry, material)
+        
+        mesh.position.set(coin.position[0], coin.position[1], coin.position[2])
+        mesh.userData.coinId = coin.id
+        
+        this.group.add(mesh)
+        this.coinMeshes.set(coin.id, {
+            mesh: mesh,
+            material: material,
+            coin: coin,
+            shattered: false
         })
     }
 
     createShatterParticles(coinMesh, coin)
     {
-        const particleCount = 20
+        const particleCount = 15
         const particles = []
-        
-        const particleGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.02)
         
         for(let i = 0; i < particleCount; i++)
         {
             const material = new CoinMaterial()
-            const particle = new THREE.Mesh(particleGeometry, material)
+            const particle = new THREE.Mesh(this.particleGeometry, material)
             
             particle.position.copy(coinMesh.mesh.position)
             
             // Random velocity for explosion effect
             const angle = (i / particleCount) * Math.PI * 2
-            const speed = 2 + Math.random() * 3
+            const speed = 3 + Math.random() * 4
             const velocity = new THREE.Vector3(
                 Math.cos(angle) * speed,
-                Math.random() * 4 + 2,
+                Math.random() * 5 + 3,
                 Math.sin(angle) * speed
             )
             
@@ -81,14 +91,25 @@ export default class CoinsView
                 velocity: velocity,
                 rotation: rotation,
                 startTime: this.time.elapsed,
-                lifetime: 1.0
+                lifetime: 0.8
             })
         }
         
         this.shatterParticles.push({
-            coin: coin,
+            coinId: coin.id,
             particles: particles
         })
+    }
+
+    removeCoinMesh(coinId)
+    {
+        const coinMesh = this.coinMeshes.get(coinId)
+        if(coinMesh)
+        {
+            this.group.remove(coinMesh.mesh)
+            coinMesh.material.dispose()
+            this.coinMeshes.delete(coinId)
+        }
     }
 
     update()
@@ -96,49 +117,42 @@ export default class CoinsView
         if(!this.state.coins) return
         
         const sun = this.state.sun
+        const sunDir = (sun && sun.direction) ? sun.direction : this.defaultSunDir
+        const sunCol = (sun && sun.color) ? sun.color : this.defaultSunCol
         
         // Update coin meshes
-        this.coinMeshes.forEach(coinMesh => {
+        const toRemove = []
+        this.coinMeshes.forEach((coinMesh, coinId) => {
             const { mesh, material, coin } = coinMesh
             
             if(!coin.collected)
             {
                 // Update shader uniforms
                 material.uniforms.uTime.value = this.time.elapsed
-                if(sun && sun.direction && sun.color && material.uniforms && material.uniforms.uSunDirection && material.uniforms.uSunColor)
-                {
-                    // copy only when sun direction/color are defined
-                    material.uniforms.uSunDirection.value.copy(sun.direction)
-                    material.uniforms.uSunColor.value.copy(sun.color)
-                }
-                else if(material.uniforms)
-                {
-                    // fallback defaults to avoid calling copy with undefined
-                    if(material.uniforms.uSunDirection && material.uniforms.uSunDirection.value && material.uniforms.uSunDirection.value.set) material.uniforms.uSunDirection.value.set(0, 1, 0)
-                    if(material.uniforms.uSunColor && material.uniforms.uSunColor.value && material.uniforms.uSunColor.value.set) material.uniforms.uSunColor.value.set(1, 1, 1)
-                }
-                
+                material.uniforms.uSunDirection.value.copy(sunDir)
+                material.uniforms.uSunColor.value.copy(sunCol)
                 mesh.visible = true
             }
             else
             {
-                // Start shatter effect
-                if(coin.shatterProgress === 0 && !coinMesh.shattered)
+                // Start shatter effect on first frame of collection
+                if(!coinMesh.shattered)
                 {
                     this.createShatterParticles(coinMesh, coin)
                     coinMesh.shattered = true
+                    mesh.visible = false // Hide immediately
                 }
                 
-                // Fade out original mesh
-                material.uniforms.uShatterProgress.value = coin.shatterProgress
-                material.uniforms.uTime.value = this.time.elapsed
-                
+                // Mark for removal after shatter completes
                 if(coin.shatterProgress >= 1)
                 {
-                    mesh.visible = false
+                    toRemove.push(coinId)
                 }
             }
         })
+        
+        // Remove completed coins
+        toRemove.forEach(coinId => this.removeCoinMesh(coinId))
         
         // Update shatter particles
         for(let i = this.shatterParticles.length - 1; i >= 0; i--)
@@ -149,57 +163,47 @@ export default class CoinsView
             for(let j = particles.length - 1; j >= 0; j--)
             {
                 const particle = particles[j]
+                
+                if(!particle || !particle.mesh || !particle.velocity)
+                {
+                    particles.splice(j, 1)
+                    continue
+                }
+                
                 const elapsed = this.time.elapsed - particle.startTime
                 const progress = elapsed / particle.lifetime
                 
                 if(progress < 1)
                 {
-                        // Defensive checks: if particle is malformed, remove it
-                        if(!particle || !particle.mesh || !particle.mesh.position || !particle.velocity)
-                        {
-                            try {
-                                if(particle && particle.mesh) this.group.remove(particle.mesh)
-                                if(particle && particle.mesh && particle.mesh.geometry) particle.mesh.geometry.dispose()
-                                if(particle && particle.material) particle.material.dispose()
-                            } catch(e) {}
-                            particles.splice(j, 1)
-                            continue
-                        }
-
-                        // Update position
-                        particle.mesh.position.x += particle.velocity.x * this.time.delta
-                        particle.mesh.position.y += particle.velocity.y * this.time.delta
-                        particle.mesh.position.z += particle.velocity.z * this.time.delta
-
-                        // Apply gravity
-                        particle.velocity.y -= 9.8 * this.time.delta
-
-                        // Update rotation
-                        if(particle.rotation)
-                        {
-                            particle.mesh.rotation.x += particle.rotation.x * this.time.delta
-                            particle.mesh.rotation.y += particle.rotation.y * this.time.delta
-                            particle.mesh.rotation.z += particle.rotation.z * this.time.delta
-                        }
-
-                        // Fade out (guard uniforms)
-                        if(particle.material && particle.material.uniforms)
-                        {
-                            particle.material.uniforms.uShatterProgress.value = progress
-                            particle.material.uniforms.uTime.value = this.time.elapsed
-
-                            if(sun && sun.direction && sun.color && particle.material.uniforms.uSunDirection && particle.material.uniforms.uSunColor)
-                            {
-                                particle.material.uniforms.uSunDirection.value.copy(sun.direction)
-                                particle.material.uniforms.uSunColor.value.copy(sun.color)
-                            }
-                        }
+                    const dt = this.time.delta
+                    
+                    // Update position
+                    particle.mesh.position.x += particle.velocity.x * dt
+                    particle.mesh.position.y += particle.velocity.y * dt
+                    particle.mesh.position.z += particle.velocity.z * dt
+                    
+                    // Apply gravity
+                    particle.velocity.y -= 15 * dt
+                    
+                    // Update rotation
+                    particle.mesh.rotation.x += particle.rotation.x * dt
+                    particle.mesh.rotation.y += particle.rotation.y * dt
+                    particle.mesh.rotation.z += particle.rotation.z * dt
+                    
+                    // Scale down as it fades
+                    const scale = 1 - progress * 0.5
+                    particle.mesh.scale.setScalar(scale)
+                    
+                    // Update material
+                    particle.material.uniforms.uShatterProgress.value = progress
+                    particle.material.uniforms.uTime.value = this.time.elapsed
+                    particle.material.uniforms.uSunDirection.value.copy(sunDir)
+                    particle.material.uniforms.uSunColor.value.copy(sunCol)
                 }
                 else
                 {
                     // Remove particle
                     this.group.remove(particle.mesh)
-                    particle.mesh.geometry.dispose()
                     particle.material.dispose()
                     particles.splice(j, 1)
                 }
@@ -215,18 +219,22 @@ export default class CoinsView
 
     destroy()
     {
-        this.coinMeshes.forEach(coinMesh => {
-            coinMesh.mesh.geometry.dispose()
+        this.coinMeshes.forEach((coinMesh) => {
+            this.group.remove(coinMesh.mesh)
             coinMesh.material.dispose()
         })
+        this.coinMeshes.clear()
         
         this.shatterParticles.forEach(shatterGroup => {
             shatterGroup.particles.forEach(particle => {
-                particle.mesh.geometry.dispose()
+                this.group.remove(particle.mesh)
                 particle.material.dispose()
             })
         })
+        this.shatterParticles = []
         
+        this.coinGeometry.dispose()
+        this.particleGeometry.dispose()
         this.view.scene.remove(this.group)
     }
 }
