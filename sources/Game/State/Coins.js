@@ -58,16 +58,20 @@ export default class Coins
         if(!this.state.player) return
 
         const playerPos = this.state.player.position.current
-        
+        // Use horizontal distance (X,Z) for collection to avoid missed pickups due to Y offset
         this.coins.forEach(coin => {
             if(!coin.collected)
             {
                 const dx = coin.position[0] - playerPos[0]
-                const dy = coin.position[1] - playerPos[1]
                 const dz = coin.position[2] - playerPos[2]
-                const distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
-                
-                if(distance < this.collectionRadius)
+                const dy = coin.position[1] - playerPos[1]
+
+                const horizDist = Math.sqrt(dx * dx + dz * dz)
+
+                // allow some vertical tolerance in case coins float above ground
+                const maxVerticalTolerance = 3.0
+
+                if(horizDist < this.collectionRadius && Math.abs(dy) < maxVerticalTolerance)
                 {
                     this.collectCoin(coin)
                 }
