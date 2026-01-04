@@ -665,10 +665,6 @@ const octaves = 4
 
 
 
-### Resources
-- [The Book of Shaders](https://thebookofshaders.com/)
-- [Three.js Journey](https://threejs-journey.com/) by Bruno Simon
-- [WebGL Fundamentals](https://webglfundamentals.org/)
 
 ---
 
