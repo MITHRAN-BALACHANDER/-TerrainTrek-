@@ -578,33 +578,6 @@ onmessage = (e) => { /* Generate terrain */ }
 
 ---
 
-## 🌐 Browser Compatibility
-
-### Supported Browsers
-
-| Browser | Minimum Version | Notes |
-|---------|----------------|-------|
-| **Chrome** | 90+ | Best performance, WebGL2 support |
-| **Firefox** | 88+ | Excellent performance, WebGL2 support |
-| **Safari** | 14+ | Good performance, some WebGL2 limitations |
-| **Edge** | 90+ | Chromium-based, same as Chrome |
-| **Opera** | 76+ | Chromium-based, same as Chrome |
-
-### Required Features
-- ✅ WebGL2 (falls back to WebGL1 with reduced features)
-- ✅ Web Workers
-- ✅ ES6 Modules
-- ✅ LocalStorage
-- ✅ Pointer Lock API
-- ✅ Fullscreen API
-- ✅ Web Audio API
-
-### Mobile Support
-- **iOS Safari**: 14+ (iPhone 8 or newer recommended)
-- **Android Chrome**: 90+ (mid-range devices, 2020+)
-- **Performance**: Limited by mobile GPU, reduced grass density recommended
-
----
 
 ## 🔧 Development
 
@@ -679,113 +652,8 @@ const octaves = 4
 
 ---
 
-## Deployment
 
-### Static Hosting (Recommended)
 
-The built application is a static site and can be deployed to:
-
-#### Vercel (Easiest)
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-#### Netlify
-```bash
-npm run build
-# Drag dist/ folder to netlify.com/drop
-```
-
-#### GitHub Pages
-```bash
-npm run build
-git subtree push --prefix dist origin gh-pages
-```
-
-#### Cloudflare Pages
-```bash
-# Connect repo to Cloudflare Pages dashboard
-# Build command: npm run build
-# Output directory: dist
-```
-
-### Environment Variables
-
-No environment variables required for base deployment.
-
-### Production Checklist
-
-- [ ] Update demo URL in README badges
-- [ ] Add Google Analytics (optional)
-- [ ] Configure CDN for assets
-- [ ] Enable gzip/brotli compression
-- [ ] Set up custom domain
-- [ ] Add meta tags for SEO
-- [ ] Test on mobile devices
-- [ ] Run Lighthouse audit
-- [ ] Configure CSP headers
-- [ ] Add sitemap.xml
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-### Reporting Bugs
-
-Open an issue with:
-- Clear description of the bug
-- Steps to reproduce
-- Expected vs actual behavior
-- Browser and OS information
-- Screenshots if applicable
-
-### Submitting Features
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-
-- Use ES6+ features
-- Follow existing file structure
-- Comment complex algorithms
-- Keep functions focused and small
-- Write descriptive variable names
-- Use camelCase for variables, PascalCase for classes
-
----
-
-## License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2026 TerrainTrek Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
-
----
 
 ## Acknowledgments
 
@@ -795,10 +663,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 - [lil-gui](https://lil-gui.georgealways.com/) - Lightweight GUI controls
 - [simplex-noise](https://github.com/jwagner/simplex-noise.js) - Noise generation
 
-### Inspiration
-- Minecraft's infinite world generation
-- No Man's Sky's procedural universe
-- Sebastian Lague's procedural terrain tutorials
+
 
 ### Resources
 - [The Book of Shaders](https://thebookofshaders.com/)
@@ -807,11 +672,6 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ---
 
-## Contact & Support
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/MITHRAN-BALACHANDER/-TerrainTrek-/issues)
-- **Discussions**: [Join community discussions](https://github.com/MITHRAN-BALACHANDER/-TerrainTrek-/discussions)
-- **Contact**: https://github.com/MITHRAN-BALACHANDER (preferred contact / profile)
 
 ---
 
