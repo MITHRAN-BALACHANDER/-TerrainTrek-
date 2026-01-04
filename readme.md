@@ -18,11 +18,7 @@
 - [Game Features](#game-features)
 - [Debug Mode](#debug-mode)
 - [Performance](#performance)
-- [Browser Compatibility](#browser-compatibility)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+-
 
 ---
 
